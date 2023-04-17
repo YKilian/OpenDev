@@ -1,4 +1,4 @@
-# V1.1
+# V1.1.2
 
 import mysql.connector
 import customtkinter
@@ -139,17 +139,19 @@ class App(customtkinter.CTk):
 
     # Register the user
     def register(self):
-        if not self.exists(self.username.get()):
-            sql = f"""
-            INSERT INTO login_data VALUES (
-                '{self.username.get()}', '{self.password.get()}'
-            )
-            """
-            my_cursor.execute(sql)
-            my_db.commit()
-            print("Registration successfull")
-        else: self.failure.configure(text = "Username already exists. Choose another one.", text_color="orange")
-        
+        if not self.password.get() == "":
+            if not self.exists(self.username.get()):
+                sql = f"""
+                INSERT INTO login_data VALUES (
+                    '{self.username.get()}', '{self.password.get()}'
+                )
+                """
+                my_cursor.execute(sql)
+                my_db.commit()
+                print("Registration successfull")
+            else: self.failure.configure(text = "Username already exists. Choose another one.", text_color="orange")
+        else: self.failure.configure(text = "Password can't be empty", text_color="red")
+
     # Checking if the username already exists
     def exists(self, username):
         sql = f"""
