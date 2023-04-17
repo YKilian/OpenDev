@@ -1,4 +1,4 @@
-#V1.0
+# V1.1
 
 import mysql.connector
 import customtkinter
@@ -7,22 +7,84 @@ from customtkinter import *
 customtkinter.set_appearance_mode("System")
 customtkinter.set_default_color_theme("dark-blue")
 
+# SQL-Data
+sql_host = "HOST"
+sql_user = "USER"
+sql_psw = "PASSWORD"
+
+
+sql_db = "database_login_py" # Can be changed if there is already a database with this name
+
 # Connect to Server
 print("Connecting to SQL server")
 my_db = mysql.connector.connect(
-    host = "HOST",
-    user = "USER",
-    password = "PASSWORD",
-    database = "DATABASE"
+    host = sql_host,
+    user = sql_user,
+    password = sql_psw
 )
-
-usersdata="TABLE"
-
 print(f"Connecting to {my_db} successfull")
 my_cursor = my_db.cursor()
 
+# Connect to database
+def reconnect():
+    global connected
+
+    my_cursor.execute("SHOW DATABASES")
+    all_db = my_cursor.fetchall()
+    # Print out all existing databases
+    # print(all_db)
+
+    print("Checking databases")
+    connected = FALSE
+    for db in all_db:
+        if db[0] == sql_db:
+            print(f'Connecting to {sql_db}')
+            my_db.connect(  host = sql_host,
+                        user = sql_user,
+                        password = sql_psw,
+                        db = sql_db)
+            print(f"Connecting to f'{sql_db}' successfull")
+            connected = TRUE;
+            break;
+
+reconnect()
+
+print("connected is", connected)
+
+# If there is no database for this project, this part creates all it needs
+if not connected:
+    print(f'{sql_db} not found')
+    print("Creating database")
+    db_create=f"""CREATE DATABASE {sql_db};"""
+    my_cursor.execute(db_create)
+    print("Creating database successfull")
+    reconnect()
+    print("Creating table login_data")
+    table_one_create="""CREATE TABLE login_data(
+    username VARCHAR(25) PRIMARY KEY,
+    password VARCHAR(25) NOT NULL
+    )"""
+    my_cursor.execute(table_one_create)
+    print("Creating table login_data successfull")
+    print("Creating admin")
+
+    # A admin user is created
+    amin_create="""INSERT INTO login_data(username, password) VALUES(
+    'admin001','MasterPass123!'
+    )"""
+
+    my_cursor.execute(amin_create)
+    print("Creating admin successfull")
+
+
 show_password = FALSE
 
+# Show all user with usernames in the console
+# command="""SELECT * FROM login_data"""
+# my_cursor.execute(command)
+# print(my_cursor.fetchall())
+
+# Main loop
 class App(customtkinter.CTk):
 
     def __init__(self):
@@ -50,9 +112,10 @@ class App(customtkinter.CTk):
         self.register_button = customtkinter.CTkButton(self.login_frame, text="Register", command=self.register)
         self.register_button.pack(pady=12, padx=15, side = BOTTOM)
 
+    # Checking if login data is correct
     def username_matches_password(self, user):
         sql = f"""
-            SELECT password FROM {usersdata}
+            SELECT password FROM login_data
             WHERE username = '{user}'
             """
         my_cursor.execute(sql)
@@ -62,6 +125,7 @@ class App(customtkinter.CTk):
         else:
             return f"{self.password.get()}FAILURE"
 
+    # Login the user
     def login(self):
         my_db.commit()
         if self.username_matches_password(self.username.get()) == self.password.get():
@@ -73,10 +137,11 @@ class App(customtkinter.CTk):
             self.failure.configure(text="Oops. That's not our failure. \n Check username and password", text_color="red")
             self.password.delete(0, len(self.password.get()))
 
+    # Register the user
     def register(self):
         if not self.exists(self.username.get()):
             sql = f"""
-            INSERT INTO {usersdata} VALUES (
+            INSERT INTO login_data VALUES (
                 '{self.username.get()}', '{self.password.get()}'
             )
             """
@@ -85,10 +150,10 @@ class App(customtkinter.CTk):
             print("Registration successfull")
         else: self.failure.configure(text = "Username already exists. Choose another one.", text_color="orange")
         
-    
+    # Checking if the username already exists
     def exists(self, username):
         sql = f"""
-                SELECT username FROM {usersdata}
+                SELECT username FROM login_data
                 WHERE username = '{username}'
             """
         my_cursor.execute(sql)
@@ -97,6 +162,7 @@ class App(customtkinter.CTk):
             return True
         return False
 
+    # Handle checkbox for showing password
     def show_pass(self):
         global show_password
         show_password = not show_password
