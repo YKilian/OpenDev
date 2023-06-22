@@ -1,0 +1,42 @@
+{
+    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "JScrollPaneExample",
+            "request": "launch",
+            "mainClass": "src.main.java.jsonManipulator.JScrollPaneExample",
+            "projectName": "jsonreader"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "src.main.java.jsonManipulator.test",
+            "projectName": "jsonreader"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "gui",
+            "request": "launch",
+            "mainClass": "src.main.java.gui.gui",
+            "projectName": "jsonreader"
+        },
+        {
+            "type": "java",
+            "name": "gui(1)",
+            "request": "launch",
+            "mainClass": "src.main.java.src.main.java.gui.gui",
+            "projectName": "notes_b5d018d0"
+        }
+    ]
+}
